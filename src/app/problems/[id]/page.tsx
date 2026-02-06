@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { MultipleChoice } from "@/components/multiple-choice";
@@ -66,6 +66,43 @@ export default function ProblemPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [results, setResults] = useState<SubmissionResult | null>(null);
   const [activeTab, setActiveTab] = useState("description");
+
+  // Resizable panel state
+  const [leftPanelWidth, setLeftPanelWidth] = useState(50); // percentage
+  const [isResizing, setIsResizing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Handle resize
+  const handleMouseDown = useCallback(() => {
+    setIsResizing(true);
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
+    // Clamp between 20% and 80%
+    setLeftPanelWidth(Math.min(80, Math.max(20, newWidth)));
+  }, [isResizing]);
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, handleMouseMove, handleMouseUp]);
 
   useEffect(() => {
     async function fetchProblem() {
@@ -279,9 +316,9 @@ export default function ProblemPage() {
   const visibleTestCases = problem.testCases?.filter((tc) => !tc.isHidden) || [];
 
   return (
-    <div className="flex h-[calc(100vh-4rem)]">
+    <div ref={containerRef} className="flex h-[calc(100vh-4rem)]" style={{ cursor: isResizing ? 'col-resize' : 'default' }}>
       {/* Left Panel - Problem Description */}
-      <div className="w-1/2 border-r border-border/50 overflow-auto bg-card/30">
+      <div style={{ width: `${leftPanelWidth}%` }} className="overflow-auto bg-card/30">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
           <div className="border-b border-border/50 px-4 sticky top-0 bg-background/95 backdrop-blur z-10">
             <TabsList className="h-12 bg-transparent">
@@ -409,8 +446,16 @@ export default function ProblemPage() {
         </Tabs>
       </div>
 
+      {/* Resize Handle */}
+      <div
+        onMouseDown={handleMouseDown}
+        className={`w-1 cursor-col-resize hover:bg-primary/50 transition-colors ${
+          isResizing ? 'bg-primary' : 'bg-border/50'
+        }`}
+      />
+
       {/* Right Panel - Code Editor */}
-      <div className="w-1/2 flex flex-col bg-[#1e1e1e]">
+      <div style={{ width: `${100 - leftPanelWidth}%` }} className="flex flex-col bg-[#1e1e1e]">
         {/* Editor Header with File Tabs */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-border/30 bg-[#252526]">
           <div className="flex items-center gap-2">
