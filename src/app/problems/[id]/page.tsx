@@ -316,7 +316,7 @@ export default function ProblemPage() {
   const visibleTestCases = problem.testCases?.filter((tc) => !tc.isHidden) || [];
 
   return (
-    <div ref={containerRef} className="flex h-[calc(100vh-4rem)]" style={{ cursor: isResizing ? 'col-resize' : 'default' }}>
+    <div ref={containerRef} className="flex h-[calc(100vh-4rem)]" style={{ cursor: isResizing ? 'col-resize' : 'default', userSelect: isResizing ? 'none' : 'auto' }}>
       {/* Left Panel - Problem Description */}
       <div style={{ width: `${leftPanelWidth}%` }} className="overflow-auto bg-card/30">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
