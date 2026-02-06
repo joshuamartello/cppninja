@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Navbar } from "@/components/navbar";
-
-const inter = Inter({ subsets: ["latin"] });
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
 
 export const metadata: Metadata = {
   title: "cppninja - Coding Practice & Mock Interviews",
@@ -22,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} ${jetbrainsMono.variable}`}>
+      <body className={`${GeistSans.className} ${GeistMono.variable}`}>
         <Providers>
           <div className="min-h-screen flex flex-col">
             <Navbar />
