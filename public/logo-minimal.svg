@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Ninja shuriken made of code brackets -->
+  <g transform="translate(100, 100)">
+    <!-- Outer ring -->
+    <circle r="90" fill="none" stroke="#22c55e" stroke-width="2" opacity="0.3"/>
+
+    <!-- Shuriken points made from angle brackets -->
+    <!-- Top -->
+    <text x="-15" y="-50" font-family="monospace" font-size="40" font-weight="bold" fill="#22c55e">&lt;&gt;</text>
+
+    <!-- Right (rotated) -->
+    <g transform="rotate(90)">
+      <text x="-15" y="-50" font-family="monospace" font-size="40" font-weight="bold" fill="#22c55e">&lt;&gt;</text>
+    </g>
+
+    <!-- Bottom (rotated) -->
+    <g transform="rotate(180)">
+      <text x="-15" y="-50" font-family="monospace" font-size="40" font-weight="bold" fill="#22c55e">&lt;&gt;</text>
+    </g>
+
+    <!-- Left (rotated) -->
+    <g transform="rotate(270)">
+      <text x="-15" y="-50" font-family="monospace" font-size="40" font-weight="bold" fill="#22c55e">&lt;&gt;</text>
+    </g>
+
+    <!-- Center: C++ -->
+    <circle r="28" fill="#0f0f0f"/>
+    <circle r="28" fill="none" stroke="#22c55e" stroke-width="2"/>
+    <text x="-20" y="8" font-family="monospace" font-size="24" font-weight="bold" fill="#22c55e">C++</text>
+  </g>
+</svg>
