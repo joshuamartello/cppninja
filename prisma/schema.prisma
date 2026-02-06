@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  submissions        Submission[]
+  interviewsAsHost   Interview[]        @relation("InterviewHost")
+  interviewsAsGuest  Interview[]        @relation("InterviewGuest")
+  interviewRequests  InterviewRequest[]
+  feedbackGiven      Feedback[]         @relation("FeedbackGiver")
+  feedbackReceived   Feedback[]         @relation("FeedbackReceiver")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Problem {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  description String      @db.Text
+  difficulty  Difficulty
+  topics      String[]
+  type        ProblemType @default(CODE)
+  category    String?     // e.g., "error-fix", "modernization", "constexpr", "algorithms"
+
+  // For CODE problems
+  starterCode Json?    // { language: string, code: string }[]
+  testCases   Json?    // { input: string, expectedOutput: string, isHidden: boolean }[]
+
+  // For MULTIPLE_CHOICE problems
+  choices       Json?    // { id: string, text: string }[]
+  correctAnswer String?  // The id of the correct choice
+
+  // For all problem types
+  explanation       String?  @db.Text // Explanation shown after answering
+  referenceSolution String?  @db.Text // Model answer shown after submission
+  hints             Json?    // Progressive hints: { order: number, text: string }[]
+  compilationCheck  Boolean  @default(false) // If true, just verify code compiles (no test cases needed)
+
+  // For compile-time testing (C++ concepts, static_asserts, template metaprogramming)
+  testType    TestType @default(STDIN_STDOUT)
+  testHarness String?  @db.Text  // Test code with {{USER_CODE}} placeholder
+
+  submissions Submission[]
+  interviews  Interview[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ProblemType {
+  CODE
+  MULTIPLE_CHOICE
+  CODE_REVIEW  // Open-ended: fix errors, review code, etc.
+}
+
+enum TestType {
+  STDIN_STDOUT  // Traditional: run with input, check output
+  UNIT_TEST     // Compile test harness with user code, run and check output
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  userId    String
+  problemId String
+  code      String   @db.Text
+  language  String
+  status    SubmissionStatus
+  runtime   Int?     // milliseconds
+  memory    Int?     // KB
+  output    String?  @db.Text
+  error     String?  @db.Text
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([problemId])
+}
+
+enum SubmissionStatus {
+  PENDING
+  RUNNING
+  ACCEPTED
+  WRONG_ANSWER
+  TIME_LIMIT_EXCEEDED
+  MEMORY_LIMIT_EXCEEDED
+  RUNTIME_ERROR
+  COMPILATION_ERROR
+}
+
+model Interview {
+  id            String          @id @default(cuid())
+  hostId        String
+  guestId       String?
+  problemId     String?
+  status        InterviewStatus @default(SCHEDULED)
+  scheduledAt   DateTime
+  startedAt     DateTime?
+  endedAt       DateTime?
+  roomId        String?         @unique
+  roomUrl       String?
+  notes         String?         @db.Text
+  sharedCode    String?         @db.Text
+
+  host     User     @relation("InterviewHost", fields: [hostId], references: [id], onDelete: Cascade)
+  guest    User?    @relation("InterviewGuest", fields: [guestId], references: [id], onDelete: SetNull)
+  problem  Problem? @relation(fields: [problemId], references: [id], onDelete: SetNull)
+  feedback Feedback[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([hostId])
+  @@index([guestId])
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model InterviewRequest {
+  id            String   @id @default(cuid())
+  userId        String
+  preferredTime DateTime
+  topics        String[]
+  role          InterviewRole
+  status        RequestStatus @default(OPEN)
+  matchedWith   String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum InterviewRole {
+  INTERVIEWER
+  INTERVIEWEE
+  EITHER
+}
+
+enum RequestStatus {
+  OPEN
+  MATCHED
+  EXPIRED
+  CANCELLED
+}
+
+model Feedback {
+  id          String @id @default(cuid())
+  interviewId String
+  giverId     String
+  receiverId  String
+  rating      Int    // 1-5
+  strengths   String? @db.Text
+  improvements String? @db.Text
+  notes       String? @db.Text
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  giver     User      @relation("FeedbackGiver", fields: [giverId], references: [id], onDelete: Cascade)
+  receiver  User      @relation("FeedbackReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([interviewId, giverId])
+  @@index([receiverId])
+}

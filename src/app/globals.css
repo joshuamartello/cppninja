@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 97%;
+    --foreground: 220 20% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 92%;
+    --secondary-foreground: 220 20% 20%;
+    --muted: 220 14% 92%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 262 83% 95%;
+    --accent-foreground: 262 83% 40%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 87%;
+    --input: 220 13% 87%;
+    --ring: 262 83% 58%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 10% 6%;
+    --foreground: 0 0% 95%;
+    --card: 240 10% 9%;
+    --card-foreground: 0 0% 95%;
+    --popover: 240 10% 9%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 262 83% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 16%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 240 5% 16%;
+    --muted-foreground: 240 5% 55%;
+    --accent: 262 50% 20%;
+    --accent-foreground: 262 83% 75%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 18%;
+    --input: 240 5% 18%;
+    --ring: 262 83% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Inline code styling */
+.prose code {
+  @apply text-primary bg-primary/10 px-1.5 py-0.5 rounded font-mono text-sm;
+}
+
+.prose code::before,
+.prose code::after {
+  content: none;
+}
+
+/* Code block styling */
+.prose pre {
+  @apply bg-[#0d1117] border border-[#30363d] rounded-lg my-4 overflow-hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+}
+
+.prose pre code {
+  @apply block p-4 text-sm leading-relaxed overflow-x-auto;
+  background: transparent;
+  color: #e6edf3;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  tab-size: 4;
+}
+
+/* Syntax highlighting - GitHub Dark theme inspired */
+.prose pre code .keyword,
+.prose pre code .hljs-keyword {
+  color: #ff7b72;
+}
+
+.prose pre code .string,
+.prose pre code .hljs-string {
+  color: #a5d6ff;
+}
+
+.prose pre code .comment,
+.prose pre code .hljs-comment {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.prose pre code .function,
+.prose pre code .hljs-title {
+  color: #d2a8ff;
+}
+
+.prose pre code .number,
+.prose pre code .hljs-number {
+  color: #79c0ff;
+}
+
+.prose pre code .class-name,
+.prose pre code .hljs-type {
+  color: #ffa657;
+}
+
+/* Manual syntax highlighting for C++ keywords */
+.code-block {
+  @apply bg-[#0d1117] border border-[#30363d] rounded-lg overflow-hidden my-6;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.code-block-header {
+  @apply flex items-center justify-between px-4 py-2 bg-[#161b22] border-b border-[#30363d];
+}
+
+.code-block-header .dots {
+  @apply flex gap-1.5;
+}
+
+.code-block-header .dot {
+  @apply w-3 h-3 rounded-full;
+}
+
+.code-block-header .dot-red { @apply bg-[#ff5f56]; }
+.code-block-header .dot-yellow { @apply bg-[#ffbd2e]; }
+.code-block-header .dot-green { @apply bg-[#27ca40]; }
+
+.code-block-header .filename {
+  @apply text-xs text-[#8b949e] font-mono;
+}
+
+.code-block-content {
+  @apply p-4 overflow-x-auto;
+}
+
+.code-block-content code {
+  @apply text-sm leading-relaxed;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  color: #e6edf3;
+}
+
+/* C++ syntax colors */
+.code-block-content .kw { color: #ff7b72; } /* keywords: class, public, private, friend, return, int, etc */
+.code-block-content .fn { color: #d2a8ff; } /* function names */
+.code-block-content .ty { color: #ffa657; } /* types: Thing, string, vector */
+.code-block-content .st { color: #a5d6ff; } /* strings */
+.code-block-content .cm { color: #8b949e; font-style: italic; } /* comments */
+.code-block-content .nu { color: #79c0ff; } /* numbers */
+.code-block-content .op { color: #e6edf3; } /* operators */
+.code-block-content .pp { color: #7ee787; } /* preprocessor */
+
+/* Gradient text utility */
+.gradient-text {
+  @apply bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent;
+}
+
+/* Glow effect */
+.glow {
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.3),
+              0 0 40px hsl(var(--primary) / 0.1);
+}
+
+/* Card hover effect */
+.card-hover {
+  @apply transition-all duration-300;
+}
+
+.card-hover:hover {
+  @apply border-primary/50 shadow-lg;
+  box-shadow: 0 0 30px hsl(var(--primary) / 0.1);
+}
