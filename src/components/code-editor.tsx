@@ -58,11 +58,14 @@ export function CodeEditor({
       minimap: { enabled: false },
       scrollBeyondLastLine: false,
       fontSize: 14,
+      fontFamily: "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
+      fontLigatures: true,
       lineNumbers: "on",
       renderLineHighlight: "all",
       automaticLayout: true,
       tabSize: 2,
       wordWrap: "on",
+      letterSpacing: 0.5,
     });
   };
 
@@ -100,11 +103,14 @@ export function CodeEditor({
           minimap: { enabled: false },
           scrollBeyondLastLine: false,
           fontSize: 14,
+          fontFamily: "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
+          fontLigatures: true,
           lineNumbers: "on",
           renderLineHighlight: "all",
           automaticLayout: true,
           tabSize: 2,
           wordWrap: "on",
+          letterSpacing: 0.5,
         }}
       />
     </div>
